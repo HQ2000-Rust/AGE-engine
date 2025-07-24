@@ -1,4 +1,4 @@
-#cargo-features = ["codegen-backend"]
+cargo-features = ["codegen-backend"]
 
 [package]
 name = "age_engine"
@@ -12,20 +12,67 @@ publish = false
 [build]
 rustflags = ["-Z", "threads=8"]
 
+[hints]
+#nightly, still good to add it
+mostly-unused=true
 
 [profile.dev]
-#codegen-backend = "cranelift"
+codegen-backend = "cranelift"
 
 [[bin]]
 name="audio"
 path = "bins/audio.rs"
 
-[dependencies]
-#wgpu="25.0.2"
-#winit="0.30.11"
-#env_logger="0.11.8"
-#log="0.4.27"
-rodio="0.20.1"
-cpal="0.16.0"
-#anyhow="1.0.98"
-#bytemuck = { version = "1.16", features = [ "derive" ] }
+[[bin]]
+name="graphics"
+path="bins/graphics.rs"
+
+#DEPENDENCIES
+
+#audio
+
+[dependencies.rodio]
+version="0.20.1"
+
+[dependencies.cpal]
+version = "0.16.0"
+
+#graphics
+
+[dependencies.anyhow]
+version="1.0"
+
+[dependencies.winit]
+version="0.30"
+features = ["android-native-activity"]
+
+[dependencies.env_logger]
+version = "0.10"
+
+[dependencies.wgpu]
+version = "25.0"
+default-features = false
+features = ["dx12","metal","gles","vulkan"]
+
+[dependencies.image]
+version = "0.24"
+default-features = false
+features = ["png", "jpeg"]
+
+[dependencies.log]
+version = "0.4"
+
+[dependencies.pollster]
+version = "0.3"
+
+[dependencies.bytemuck]
+version = "1.16"
+features = ["derive"]
+
+[dependencies.cgmath]
+version = "0.18.0"
+
+[dependencies.tobj]
+version = "3.2"
+default-features = false
+features = ["async"]
