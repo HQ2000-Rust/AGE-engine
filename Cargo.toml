@@ -1,4 +1,4 @@
-cargo-features = ["codegen-backend"]
+#cargo-features = ["codegen-backend"]
 
 [package]
 name = "age_engine"
@@ -16,8 +16,8 @@ rustflags = ["-Z", "threads=8"]
 #nightly, still good to add it
 mostly-unused=true
 
-[profile.dev]
-codegen-backend = "cranelift"
+#[profile.dev]
+#codegen-backend = "cranelift"
 
 [[bin]]
 name="audio"
@@ -27,7 +27,15 @@ path = "bins/audio.rs"
 name="graphics"
 path="bins/graphics.rs"
 
+[[bin]]
+name="schedule"
+path="bins/schedule.rs"
+
 #DEPENDENCIES
+
+#general
+
+#/
 
 #audio
 
@@ -50,7 +58,7 @@ features = ["android-native-activity"]
 version = "0.10"
 
 [dependencies.wgpu]
-version = "25.0"
+version = "26.0.1"
 default-features = false
 features = ["dx12","metal","gles","vulkan"]
 
