@@ -1,0 +1,8 @@
+[package]
+name = "core"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+graphics_core = { path = "../graphics_core" }
+anymap = { version = "0.12.1" }
