@@ -12,10 +12,6 @@ pub mod output_markers {
     pub struct OutputDisabled;
     pub struct OutputEnabled;
 }
-pub mod input_markers {
-    pub struct InputEnabled;
-    pub struct InputDisabled;
-}
 
 pub struct OutputHandle<O> {
     pub(super) stream: Option<OutputStream>,
