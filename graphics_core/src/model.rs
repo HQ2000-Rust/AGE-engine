@@ -1,7 +1,27 @@
+use std::collections::VecDeque;
 use std::ops::Range;
-
+use std::path::Path;
 use super::texture;
 
+pub struct Models {
+    loaded_models: VecDeque<Model>,
+}
+
+impl Models {
+    pub fn new() -> Models {
+        Self {
+            loaded_models: VecDeque::new(),
+        }
+    }
+    pub fn load_model<P: AsRef<Path>>(&mut self, path: P) {
+        fn inner(models: &mut Models,path: &Path) {
+            
+        }
+        inner(self,path.as_ref());
+    }
+}
+
+//everything down here is from Sotrh's tutorial
 pub trait Vertex {
     fn desc() -> wgpu::VertexBufferLayout<'static>;
 }
@@ -42,15 +62,12 @@ impl Vertex for ModelVertex {
 }
 
 pub struct Material {
-    #[allow(unused)]
     pub name: String,
-    #[allow(unused)]
     pub diffuse_texture: texture::Texture,
     pub bind_group: wgpu::BindGroup,
 }
 
 pub struct Mesh {
-    #[allow(unused)]
     pub name: String,
     pub vertex_buffer: wgpu::Buffer,
     pub index_buffer: wgpu::Buffer,
@@ -64,7 +81,6 @@ pub struct Model {
 }
 
 pub trait DrawModel<'a> {
-    #[allow(unused)]
     fn draw_mesh(
         &mut self,
         mesh: &'a Mesh,
@@ -78,8 +94,6 @@ pub trait DrawModel<'a> {
         instances: Range<u32>,
         camera_bind_group: &'a wgpu::BindGroup,
     );
-
-    #[allow(unused)]
     fn draw_model(&mut self, model: &'a Model, camera_bind_group: &'a wgpu::BindGroup);
     fn draw_model_instanced(
         &mut self,
