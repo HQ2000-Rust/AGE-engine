@@ -1,12 +1,12 @@
 use std::io::{BufReader, Cursor};
 
 use wgpu::util::DeviceExt;
-
+use crate::errors::{ModelError, TextureError};
 use super::texture;
 
 use super::model;
 
-pub async fn load_string(file_name: &str) -> anyhow::Result<String> {
+pub async fn load_string(file_name: &str) -> std::io::Result<String> {
     let txt = {
         let path = std::path::Path::new("assets").join(file_name);
         std::fs::read_to_string(path)?
@@ -15,7 +15,7 @@ pub async fn load_string(file_name: &str) -> anyhow::Result<String> {
     Ok(txt)
 }
 
-pub async fn load_binary(file_name: &str) -> anyhow::Result<Vec<u8>> {
+pub async fn load_binary(file_name: &str) -> std::io::Result<Vec<u8>> {
     let data = {
         let path = std::path::Path::new("assets").join(file_name);
         std::fs::read(path)?
@@ -28,8 +28,8 @@ pub async fn load_texture(
     file_name: &str,
     device: &wgpu::Device,
     queue: &wgpu::Queue,
-) -> anyhow::Result<texture::Texture> {
-    let data = load_binary(file_name).await?;
+) -> Result<texture::Texture,TextureError> {
+    let data = load_binary(file_name).await.map_err(TextureError::IoError)?;
     texture::Texture::from_bytes(device, queue, &data, file_name)
 }
 
@@ -38,8 +38,8 @@ pub async fn load_model(
     device: &wgpu::Device,
     queue: &wgpu::Queue,
     layout: &wgpu::BindGroupLayout,
-) -> anyhow::Result<model::Model> {
-    let obj_text = load_string(file_name).await?;
+) -> Result<model::Model,ModelError> {
+    let obj_text = load_string(file_name).await.map_err(ModelError::IoError)?;
     let obj_cursor = Cursor::new(obj_text);
     let mut obj_reader = BufReader::new(obj_cursor);
 
@@ -55,11 +55,11 @@ pub async fn load_model(
             tobj::load_mtl_buf(&mut BufReader::new(Cursor::new(mat_text)))
         },
     )
-    .await?;
+    .await.map_err(ModelError::LoadError)?;
 
     let mut materials = Vec::new();
-    for m in obj_materials? {
-        let diffuse_texture = load_texture(&m.diffuse_texture, device, queue).await?;
+    for m in obj_materials.map_err(ModelError::LoadError)? {
+        let diffuse_texture = load_texture(&m.diffuse_texture, device, queue).await.map_err(ModelError::TextureError)?;
         let bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
             layout,
             entries: &[
