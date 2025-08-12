@@ -14,26 +14,48 @@ use winit::keyboard::KeyCode;
 use winit::window::Window;
 
 pub struct State {
+    //stays
     surface: wgpu::Surface<'static>,
+    //stays
     device: wgpu::Device,
+    //stays
     queue: wgpu::Queue,
+    //stays
     config: wgpu::SurfaceConfiguration,
+    //stays
     is_surface_configured: bool,
+    //stays
     render_pipeline: wgpu::RenderPipeline,
-    obj_model: model::Model,
+    //getting changed
+    models: model::Models,
+    //stays very likely
     camera: Camera,
+    //prob going to remove this
     camera_controller: CameraController,
+    //idk
     camera_uniform: CameraUniform,
+    //we'll see
     camera_buffer: wgpu::Buffer,
+    //same as above
     camera_bind_group: wgpu::BindGroup,
+    //stays
     instances: Vec<Instance>,
     instance_buffer: wgpu::Buffer,
     depth_texture: texture::Texture,
-    pub(crate) window: Arc<Window>,
+    //stays
+    pub window: Arc<Window>,
 }
 
+use crate::config::StateConfig;
+use crate::errors::StateCreationError;
+
 impl State {
-    pub(crate) async fn new(window: Arc<Window>) -> anyhow::Result<State> {
+    #[inline]
+    pub fn apply_config(self,config: StateConfig) -> Self {
+        config.apply_to_state(self)
+    }
+
+    pub async fn new(window: Arc<Window>) -> Result<State,StateCreationError> {
         let size = window.inner_size();
 
         // The instance is a handle to our GPU
@@ -52,8 +74,7 @@ impl State {
                 compatible_surface: Some(&surface),
                 force_fallback_adapter: false,
             })
-            .await
-            .unwrap();
+            .await.map_err(StateCreationError::RequestAdapterError)?;
         log::warn!("device and queue");
         let (device, queue) = adapter
             .request_device(&wgpu::DeviceDescriptor {
@@ -66,7 +87,7 @@ impl State {
                 trace: wgpu::Trace::Off,
             })
             .await
-            .unwrap();
+            .map_err(StateCreationError::RequestDeviceError)?;
 
         log::warn!("Surface");
         let surface_caps = surface.get_capabilities(&adapter);
@@ -193,7 +214,7 @@ impl State {
         let obj_model =
             resources::load_model("cube.obj", &device, &queue, &texture_bind_group_layout)
                 .await
-                .unwrap();
+                .map_err(StateCreationError::ModelError);
 
         let shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
             label: Some("shader.wgsl"),
@@ -271,7 +292,8 @@ impl State {
             config,
             is_surface_configured: false,
             render_pipeline,
-            obj_model,
+            //TODO!
+            models,
             camera,
             camera_controller,
             camera_buffer,
@@ -284,11 +306,11 @@ impl State {
         })
     }
 
-    pub(crate) fn window(&self) -> &Window {
+    pub fn window(&self) -> &Window {
         &self.window
     }
 
-    pub(crate) fn resize(&mut self, width: u32, height: u32) {
+    pub fn resize(&mut self, width: u32, height: u32) {
         if width > 0 && height > 0 {
             self.config.width = width;
             self.config.height = height;
@@ -299,7 +321,8 @@ impl State {
                 texture::Texture::create_depth_texture(&self.device, &self.config, "depth_texture");
         }
     }
-    pub(crate) fn handle_key(&mut self, event_loop: &ActiveEventLoop, key: KeyCode, pressed: bool) {
+    //TODO!: remove this function
+    pub fn handle_key(&mut self, event_loop: &ActiveEventLoop, key: KeyCode, pressed: bool) {
         if key == KeyCode::Escape && pressed {
             event_loop.exit();
         } else {
@@ -307,7 +330,8 @@ impl State {
         }
     }
 
-    pub(crate) fn update(&mut self) {
+    //TODO!: refactor or remove and replace
+    pub fn update(&mut self) {
         self.camera_controller.update_camera(&mut self.camera);
         log::info!("{:?}", self.camera);
         self.camera_uniform.update_view_proj(&self.camera);
@@ -319,7 +343,8 @@ impl State {
         );
     }
 
-    pub(crate) fn render(&mut self) -> Result<(), wgpu::SurfaceError> {
+    //TODO!: refactor!
+    pub fn render(&mut self) -> Result<(), wgpu::SurfaceError> {
         self.window.request_redraw();
 
         // We can't render unless the surface is configured
