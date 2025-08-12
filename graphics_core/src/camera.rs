@@ -46,6 +46,7 @@ impl CameraUniform {
     }
 }
 
+//TODO!: implement a camera control api and remove this
 pub(crate) struct CameraController {
     speed: f32,
     is_up_pressed: bool,
