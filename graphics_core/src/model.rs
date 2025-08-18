@@ -1,7 +1,7 @@
+use super::texture;
 use std::collections::VecDeque;
 use std::ops::Range;
 use std::path::Path;
-use super::texture;
 
 pub struct Models {
     loaded_models: VecDeque<Model>,
@@ -14,10 +14,8 @@ impl Models {
         }
     }
     pub fn load_model<P: AsRef<Path>>(&mut self, path: P) {
-        fn inner(models: &mut Models,path: &Path) {
-            
-        }
-        inner(self,path.as_ref());
+        fn inner(models: &mut Models, path: &Path) {}
+        inner(self, path.as_ref());
     }
 }
 
