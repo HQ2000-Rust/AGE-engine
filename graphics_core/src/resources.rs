@@ -12,19 +12,6 @@ use super::model;
 pub async fn load_string(file_name: &str) -> std::io::Result<String> {
     let txt = {
         let path = Path::new("res").join(file_name);
-        {
-            let mut result = Vec::new();
-            for entry in read_dir(Path::new("."))? {
-                let entry: DirEntry = entry?;
-                result.push(entry.file_name());
-            }
-            let result = result
-                .iter()
-                .map(|os_string| os_string.to_string_lossy())
-                .collect::<Vec<_>>()
-                .join("   ");
-            dbg!(result);
-        }
         std::fs::read_to_string(path)?
     };
 
