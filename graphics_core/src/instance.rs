@@ -1,6 +1,6 @@
-pub(crate) struct Instance {
-    pub(crate) position: cgmath::Vector3<f32>,
-    pub(crate) rotation: cgmath::Quaternion<f32>,
+pub struct Instance {
+    pub position: cgmath::Vector3<f32>,
+    pub rotation: cgmath::Quaternion<f32>,
 }
 
 impl Instance {
@@ -16,7 +16,6 @@ impl Instance {
 #[repr(C)]
 #[derive(Debug, Copy, Clone, bytemuck::Pod, bytemuck::Zeroable)]
 pub(crate) struct InstanceRaw {
-    #[allow(dead_code)]
     model: [[f32; 4]; 4],
 }
 
