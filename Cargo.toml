@@ -2,7 +2,7 @@
 
 [workspace]
 resolver = "3"
-members = ["audio", "age_core", "event-derive", "graphics", "graphics_core", "quickstart","event-derive"]
+members = ["audio", "event_derive", "graphics", "graphics_core", "quickstart", "event_derive"]
 #remove when ready
 publish = false
 
@@ -12,14 +12,59 @@ version = "0.1.0"
 edition = "2024"
 authors = ["Jonathan Schmittat"]
 
+[[bin]]
+name="events"
+path="tests/events.rs"
+
+[[bin]]
+name="general"
+path = "tests/general.rs"
+
 [dependencies]
 #graphics={path="./graphics"}
-#graphics_core={path="./graphics_core"}
+graphics_core={path="./graphics_core"}
 audio={path="./audio"}
 #quickstart={path="./quickstart"}
-age_core={path="./age_core"}
-event-derive={path="./event-derive"}
+event_derive={path= "event_derive" }
+anymap = "0.12.1"
 
+[dependencies.anyhow]
+version="1.0.98"
+
+[dependencies.winit]
+version="0.30.12"
+features = ["android-native-activity"]
+
+[dependencies.env_logger]
+version = "0.10.2"
+
+[dependencies.wgpu]
+version = "26.0.1"
+default-features = false
+features = ["dx12","metal","gles","vulkan","wgsl"]
+
+[dependencies.image]
+version = "0.24.9"
+default-features = false
+features = ["png", "jpeg"]
+
+[dependencies.log]
+version = "0.4"
+
+[dependencies.pollster]
+version = "0.4.0"
+
+[dependencies.bytemuck]
+version = "1.16"
+features = ["derive"]
+
+[dependencies.cgmath]
+version = "0.18.0"
+
+[dependencies.tobj]
+version = "3.2.5"
+default-features = false
+features = ["async"]
 
 
 
