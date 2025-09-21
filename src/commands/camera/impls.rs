@@ -3,6 +3,7 @@ use crate::commands::Command;
 use crate::game::Game;
 use cgmath::prelude::*;
 
+//TODO
 /*impl Command for SetSpeed {
     fn execute(&self, game: &mut Game) {
         let mut camera=game.graphics_state.as_mut().expect("Should be Some(_) now, Game is running").camera;
