@@ -3,6 +3,7 @@ name = "graphics_core"
 version = "0.1.0"
 edition = "2024"
 
+
 [build-dependencies]
 anyhow = "1.0"
 fs_extra = "1.2"
@@ -21,8 +22,8 @@ version = "0.10.2"
 
 [dependencies.wgpu]
 version = "26.0.1"
-default-features = false
-features = ["dx12","metal","gles","vulkan","wgsl","parking_lot","std","static-dxc"]
+#default-features = false
+features = ["dx12","metal","gles","vulkan","wgsl","parking_lot","std","static-dxc","std"]
 
 [dependencies.image]
 version = "0.24.9"
