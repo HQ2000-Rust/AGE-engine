@@ -28,6 +28,7 @@ impl Scheduler {
         resources: &mut AnyMap,
         event_handle: &mut EventHandle,
     ) {
+        println!("Once len: {}", self.once.len());
         for f in self.once.iter_mut() {
             f(commands, resources, event_handle);
         }
