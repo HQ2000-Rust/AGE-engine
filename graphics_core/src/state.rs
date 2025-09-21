@@ -1,6 +1,6 @@
-use super::camera::{Camera, CameraUniform};
+use super::camera::{Camera, Projection, uniform::CameraUniform};
 use super::instance::{Instance, InstanceRaw};
-use super::model::{DrawModel, Model, Models, Vertex};
+use super::model::{DrawModel, Model, Vertex};
 
 //temp
 const NUM_INSTANCES_PER_ROW: u16 = 1;
@@ -9,11 +9,15 @@ use cgmath::prelude::*;
 use cgmath::{InnerSpace, Zero};
 use std::iter;
 use std::sync::Arc;
-use wgpu::Color;
+use wgpu::naga::FastHashMap;
 use wgpu::util::DeviceExt;
 use winit::window::Window;
 
 pub struct State {
+    //for model loading
+    pub texture_bind_group_layout: wgpu::BindGroupLayout,
+    //"new"
+    projection: Projection,
     //new!
     pub clear_color: wgpu::Color,
     //stays
@@ -28,8 +32,8 @@ pub struct State {
     pub is_surface_configured: bool,
     //stays
     pub render_pipeline: wgpu::RenderPipeline,
-    //getting changed
-    pub models: model::Models,
+    //stays
+    pub models: FastHashMap<&'static str, Model>,
     //stays very likely
     pub camera: Camera,
     //idk
@@ -40,17 +44,20 @@ pub struct State {
     pub camera_bind_group: wgpu::BindGroup,
     //stays
     pub instances: Vec<Instance>,
-    //for the vertex buffer, stays ig
+    //for the vertex buffer, remove
     pub instance_buffer: wgpu::Buffer,
-    //remove?
+    //remove? - yes
     pub depth_texture: texture::Texture,
+    // /\ replaces, only depth texture for now for easier usage
+    pub depth_textures: Vec<texture::Texture>,
     //stays
     pub window: Arc<Window>,
-    pub obj_model: Model,
+    //pub obj_model: Model,
 }
 
 use crate::config::StateConfig;
 use crate::errors::StateCreationError;
+use crate::resources::load_model;
 
 impl State {
     pub async fn new(
@@ -90,7 +97,6 @@ impl State {
             })
             .await
             .map_err(StateCreationError::RequestDeviceError)?;
-        let models = Models::new();
         log::warn!("Surface");
         let surface_caps = surface.get_capabilities(&adapter);
         // Shader code in this tutorial assumes an Srgb surface texture. Using a different
@@ -136,25 +142,6 @@ impl State {
                 ],
                 label: Some("texture_bind_group_layout"),
             });
-
-        let camera = Camera {
-            eye: (0.0, 5.0, -10.0).into(),
-            target: (0.0, 0.0, 0.0).into(),
-            up: cgmath::Vector3::unit_y(),
-            aspect: config.width as f32 / config.height as f32,
-            fovy: 45.0,
-            znear: 0.1,
-            zfar: 100.0,
-        };
-
-        let mut camera_uniform = CameraUniform::new();
-        camera_uniform.update_view_proj(&camera);
-
-        let camera_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("Camera Buffer"),
-            contents: bytemuck::cast_slice(&[camera_uniform]),
-            usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
-        });
 
         //TODO!: get it to the "distribution.rs" file
         const SPACE_BETWEEN: f32 = 3.0;
@@ -202,20 +189,15 @@ impl State {
                 label: Some("camera_bind_group_layout"),
             });
 
-        let camera_bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
-            layout: &camera_bind_group_layout,
-            entries: &[wgpu::BindGroupEntry {
-                binding: 0,
-                resource: camera_buffer.as_entire_binding(),
-            }],
-            label: Some("camera_bind_group"),
-        });
-
-        log::warn!("Load model");
-        let obj_model =
-            resources::load_model("cube.obj", &device, &queue, &texture_bind_group_layout)
-                .await
-                .map_err(StateCreationError::ModelError);
+        //log::warn!("Load model");
+        /*let obj_model = resources::load_model(
+            "cube\\cube.obj",
+            &device,
+            &queue,
+            &texture_bind_group_layout,
+        )
+        .await
+        .map_err(StateCreationError::ModelError);*/
 
         let shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
             label: Some("shader.wgsl"),
@@ -231,6 +213,22 @@ impl State {
                 bind_group_layouts: &[&texture_bind_group_layout, &camera_bind_group_layout],
                 push_constant_ranges: &[],
             });
+
+        //I only want to preset the capacity
+        let mut models =
+            FastHashMap::with_capacity_and_hasher(general_config.models.len(), Default::default());
+
+        for (name, path) in general_config.models.into_iter() {
+            let loaded = load_model(
+                &path,
+                &device,
+                &queue,
+                &texture_bind_group_layout,
+            )
+            .await
+            .map_err(StateCreationError::ModelError)?;
+            models.insert(name, loaded);
+        }
 
         //TODO!: configs!
         let render_pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
@@ -286,11 +284,36 @@ impl State {
             // Useful for optimizing shader compilation on Android
             cache: None,
         });
+        let camera = Camera::new((0.0, 5.0, 10.0), cgmath::Deg(-90.0), cgmath::Deg(-20.0));
 
+        let projection =
+            Projection::new(config.width, config.height, cgmath::Deg(45.0), 0.1, 100.0);
+
+        let mut camera_uniform = CameraUniform::new();
+        camera_uniform.update_view_proj(&camera, &projection);
+        //TODO make configurable
+        let camera_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+            label: Some("Camera Buffer"),
+            contents: bytemuck::cast_slice(&[camera_uniform]),
+            usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
+        });
         let clear_color = general_config.color;
+        let camera_bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
+            layout: &camera_bind_group_layout,
+            entries: &[wgpu::BindGroupEntry {
+                binding: 0,
+                resource: camera_buffer.as_entire_binding(),
+            }],
+            label: Some("camera_bind_group"),
+        });
 
         Ok(Self {
-            obj_model: obj_model.unwrap(),
+            texture_bind_group_layout,
+            projection,
+            //TODO: temp
+            depth_textures: Vec::new(),
+            //obj_model: obj_model.unwrap(),
+            //TODO
             surface,
             device,
             queue,
@@ -317,10 +340,10 @@ impl State {
 
     pub fn resize(&mut self, width: u32, height: u32) {
         if width > 0 && height > 0 {
+            self.projection.resize(width, height);
+            self.is_surface_configured = true;
             self.config.width = width;
             self.config.height = height;
-            self.is_surface_configured = true;
-            self.camera.aspect = self.config.width as f32 / self.config.height as f32;
             self.surface.configure(&self.device, &self.config);
             self.depth_texture =
                 texture::Texture::create_depth_texture(&self.device, &self.config, "depth_texture");
@@ -331,7 +354,8 @@ impl State {
     pub fn update(&mut self) {
         //self.camera_controller.update_camera(&mut self.camera);
         //log::info!("{:?}", self.camera);
-        self.camera_uniform.update_view_proj(&self.camera);
+        self.camera_uniform
+            .update_view_proj(&self.camera, &self.projection);
         log::info!("{:?}", self.camera_uniform);
         self.queue.write_buffer(
             &self.camera_buffer,
@@ -341,7 +365,10 @@ impl State {
     }
 
     //TODO!: refactor!
-    pub fn render(&mut self) -> Result<(), wgpu::SurfaceError> {
+    pub fn render(
+        &mut self,
+        model_ids: impl Iterator<Item = &'static str>,
+    ) -> Result<(), wgpu::SurfaceError> {
         self.window.request_redraw();
 
         // We can't render unless the surface is configured
@@ -360,39 +387,47 @@ impl State {
                 label: Some("Render Encoder"),
             });
 
-        {
-            let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
-                label: Some("Render Pass"),
-                color_attachments: &[Some(wgpu::RenderPassColorAttachment {
-                    view: &view,
-                    resolve_target: None,
-                    ops: wgpu::Operations {
-                        load: wgpu::LoadOp::Clear(self.clear_color),
-                        //TODO!: come back here later!!
-                        store: wgpu::StoreOp::Store,
-                    },
-                    depth_slice: None,
-                })],
-                depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachment {
-                    view: &self.depth_texture.view,
-                    depth_ops: Some(wgpu::Operations {
-                        load: wgpu::LoadOp::Clear(1.0),
-                        store: wgpu::StoreOp::Store,
-                    }),
-                    stencil_ops: None,
+        let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
+            label: Some("Render Pass"),
+            color_attachments: &[Some(wgpu::RenderPassColorAttachment {
+                view: &view,
+                resolve_target: None,
+                ops: wgpu::Operations {
+                    load: wgpu::LoadOp::Clear(self.clear_color),
+                    //TODO!: come back here later!!
+                    store: wgpu::StoreOp::Store,
+                },
+                depth_slice: None,
+            })],
+            depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachment {
+                view: &self.depth_texture.view,
+                depth_ops: Some(wgpu::Operations {
+                    load: wgpu::LoadOp::Clear(1.0),
+                    store: wgpu::StoreOp::Store,
                 }),
-                occlusion_query_set: None,
-                timestamp_writes: None,
-            });
+                stencil_ops: None,
+            }),
+            occlusion_query_set: None,
+            timestamp_writes: None,
+        });
 
-            render_pass.set_vertex_buffer(1, self.instance_buffer.slice(..));
+        /*render_pass.set_vertex_buffer(1, self.instance_buffer.slice(..));
+        render_pass.set_pipeline(&self.render_pipeline);
+        //TODO!
+        render_pass.draw_model_instanced(
+            &self.obj_model,
+            0..self.instances.len() as u32,
+            &self.camera_bind_group,
+        );*/
+
+        model_ids.for_each(|model_id| {
+            //TODO: model existence guarantees?!
+            let model = &mut self.models.get(model_id).expect("???");
             render_pass.set_pipeline(&self.render_pipeline);
-            render_pass.draw_model_instanced(
-                &self.obj_model,
-                0..self.instances.len() as u32,
-                &self.camera_bind_group,
-            );
-        }
+            render_pass.draw_model_instanced(model, 0..1, &self.camera_bind_group);
+        });
+
+        drop(render_pass);
 
         self.queue.submit(iter::once(encoder.finish()));
         output.present();
