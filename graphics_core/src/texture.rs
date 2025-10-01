@@ -1,6 +1,7 @@
 use crate::errors::TextureError;
-use image::{GenericImageView, ImageError};
+use image::GenericImageView;
 
+#[derive(Clone)]
 pub struct Texture {
     pub texture: wgpu::Texture,
     pub view: wgpu::TextureView,
@@ -33,6 +34,7 @@ impl Texture {
         let texture = device.create_texture(&desc);
         let view = texture.create_view(&wgpu::TextureViewDescriptor::default());
         let sampler = device.create_sampler(&wgpu::SamplerDescriptor {
+            //TODO: customize later
             address_mode_u: wgpu::AddressMode::ClampToEdge,
             address_mode_v: wgpu::AddressMode::ClampToEdge,
             address_mode_w: wgpu::AddressMode::ClampToEdge,
