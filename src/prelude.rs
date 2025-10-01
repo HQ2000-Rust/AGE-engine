@@ -12,6 +12,8 @@ pub use crate::world::commands::*;
 
 pub use crate::world::Entity;
 
+pub use audio::output_handle::OutputHandle;
+
 /***********************
 Commands
 ***********************/
