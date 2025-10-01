@@ -44,7 +44,7 @@ impl Vertex for ModelVertex {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct Material {
     pub name: String,
     pub diffuse_texture: texture::Texture,
@@ -60,7 +60,7 @@ pub struct Mesh {
     pub material: usize,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct Model {
     pub meshes: Vec<Mesh>,
     pub materials: Vec<Material>,
@@ -109,10 +109,15 @@ where
         instances: Range<u32>,
         camera_bind_group: &'b wgpu::BindGroup,
     ) {
-        self.set_vertex_buffer(0, mesh.vertex_buffer.slice(..));
+        //FIXME 1 or 0
+        self.set_vertex_buffer(1, mesh.vertex_buffer.slice(..));
         self.set_index_buffer(mesh.index_buffer.slice(..), wgpu::IndexFormat::Uint32);
+
+        //self.set_pipeline(pipeline);
+
         self.set_bind_group(0, &material.bind_group, &[]);
         self.set_bind_group(1, camera_bind_group, &[]);
+        //self.set_pipeline(pipeline);
         self.draw_indexed(0..mesh.num_elements, 0, instances);
     }
 
