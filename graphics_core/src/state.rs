@@ -1,4 +1,4 @@
-use super::camera::{Camera, Projection, uniform::CameraUniform};
+use super::camera::{Camera, CameraController, Projection, uniform::CameraUniform};
 use super::instance::{Instance, InstanceRaw};
 use super::model::{DrawModel, Model, Vertex};
 
@@ -7,13 +7,24 @@ const NUM_INSTANCES_PER_ROW: u16 = 1;
 use super::{model, resources, texture};
 use cgmath::prelude::*;
 use cgmath::{InnerSpace, Zero};
+use pollster::block_on;
 use std::iter;
 use std::sync::Arc;
+use std::time::Duration;
+use wgpu::BufferSlice;
 use wgpu::naga::FastHashMap;
 use wgpu::util::DeviceExt;
+use winit::event::{ElementState, KeyEvent, MouseButton, MouseScrollDelta, WindowEvent};
+use winit::event_loop::ActiveEventLoop;
+use winit::keyboard::{KeyCode, PhysicalKey};
 use winit::window::Window;
 
+#[derive(Debug)]
 pub struct State {
+    pub test_model: Model,
+    pub mouse_pressed: bool,
+
+    pub camera_controller: CameraController,
     //for model loading
     pub texture_bind_group_layout: wgpu::BindGroupLayout,
     //"new"
@@ -60,6 +71,27 @@ use crate::errors::StateCreationError;
 use crate::resources::load_model;
 
 impl State {
+    pub fn handle_key(&mut self, event_loop: &ActiveEventLoop, key: KeyCode, pressed: bool) {
+        if !self.camera_controller.handle_key(key, pressed) {
+            match (key, pressed) {
+                (KeyCode::Escape, true) => event_loop.exit(),
+                _ => {}
+            }
+        }
+    }
+
+    pub fn handle_mouse_button(&mut self, button: MouseButton, pressed: bool) {
+        match button {
+            MouseButton::Left => self.mouse_pressed = pressed,
+            _ => {}
+        }
+    }
+
+    // NEW!
+    pub fn handle_mouse_scroll(&mut self, delta: &MouseScrollDelta) {
+        self.camera_controller.handle_scroll(delta);
+    }
+
     pub async fn new(
         window: Arc<Window>,
         general_config: StateConfig,
@@ -170,6 +202,7 @@ impl State {
         let instance_data = instances.iter().map(Instance::to_raw).collect::<Vec<_>>();
         let instance_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some("Instance Buffer"),
+            //temporary, will be changed before the usage
             contents: bytemuck::cast_slice(&instance_data),
             usage: wgpu::BufferUsages::VERTEX,
         });
@@ -219,14 +252,10 @@ impl State {
             FastHashMap::with_capacity_and_hasher(general_config.models.len(), Default::default());
 
         for (name, path) in general_config.models.into_iter() {
-            let loaded = load_model(
-                &path,
-                &device,
-                &queue,
-                &texture_bind_group_layout,
-            )
-            .await
-            .map_err(StateCreationError::ModelError)?;
+            let loaded = load_model(&path, &device, &queue, &texture_bind_group_layout)
+                .await
+                .map_err(StateCreationError::ModelError)?;
+            dbg!(&loaded);
             models.insert(name, loaded);
         }
 
@@ -307,7 +336,19 @@ impl State {
             label: Some("camera_bind_group"),
         });
 
+        camera_uniform.update_view_proj(&camera, &projection);
+
+        let test_model=
+            load_model(r"C:\Users\jonat\RustroverProjects\SummerOfMaking2025\age_engine\graphics_core\res\cube.obj",
+                       &device,
+                       &queue,
+                       &texture_bind_group_layout,
+            ).await.unwrap();
+
         Ok(Self {
+            test_model,
+            mouse_pressed: false,
+            camera_controller: CameraController::new(4., 0.4),
             texture_bind_group_layout,
             projection,
             //TODO: temp
@@ -351,8 +392,8 @@ impl State {
     }
 
     //TODO!: refactor or remove and replace
-    pub fn update(&mut self) {
-        //self.camera_controller.update_camera(&mut self.camera);
+    pub fn update(&mut self, dt: Duration) {
+        self.camera_controller.update_camera(&mut self.camera, dt);
         //log::info!("{:?}", self.camera);
         self.camera_uniform
             .update_view_proj(&self.camera, &self.projection);
@@ -393,8 +434,12 @@ impl State {
                 view: &view,
                 resolve_target: None,
                 ops: wgpu::Operations {
-                    load: wgpu::LoadOp::Clear(self.clear_color),
-                    //TODO!: come back here later!!
+                    load: wgpu::LoadOp::Clear(wgpu::Color {
+                        r: 0.1,
+                        g: 0.2,
+                        b: 0.3,
+                        a: 1.0,
+                    }),
                     store: wgpu::StoreOp::Store,
                 },
                 depth_slice: None,
@@ -411,21 +456,26 @@ impl State {
             timestamp_writes: None,
         });
 
-        /*render_pass.set_vertex_buffer(1, self.instance_buffer.slice(..));
-        render_pass.set_pipeline(&self.render_pipeline);
-        //TODO!
-        render_pass.draw_model_instanced(
-            &self.obj_model,
-            0..self.instances.len() as u32,
-            &self.camera_bind_group,
-        );*/
-
         model_ids.for_each(|model_id| {
+
+            //println!("Model ID: {}", model_id);
+            //log::info!("rendering {:?}", model_id);
+
             //TODO: model existence guarantees?!
+
+            //render_pass.set_vertex_buffer(1, self.instance_buffer.slice(..));
+
             let model = &mut self.models.get(model_id).expect("???");
+
+            render_pass.set_vertex_buffer(0, self.instance_buffer.slice(..));
+
             render_pass.set_pipeline(&self.render_pipeline);
-            render_pass.draw_model_instanced(model, 0..1, &self.camera_bind_group);
+
+            render_pass.draw_model(model, &self.camera_bind_group);
         });
+
+
+
 
         drop(render_pass);
 
