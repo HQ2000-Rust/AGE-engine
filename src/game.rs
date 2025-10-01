@@ -9,7 +9,6 @@ use std::path::Path;
 
 const FPS: u32 = 60;
 
-#[derive(Debug)]
 pub struct Game {
     //Terminate is a ZST (=just symbolic)
     pub(crate) termination_tx: Option<std::sync::mpsc::SyncSender<Terminate>>,
