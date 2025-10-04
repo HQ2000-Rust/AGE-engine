@@ -7,4 +7,4 @@ pub(crate) type _MaxParamGameFn = Box<dyn FnMut(&mut Commands, &mut AnyMap, &mut
 pub type Commands = CommandHandle;
 pub type Events = EventHandle;
 
-pub(crate) type SendAnyMap = Map<dyn anymap::any::Any + Send>;
+pub type SendAnyMap = Map<dyn anymap::any::Any + Send>;
