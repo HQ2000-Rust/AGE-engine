@@ -1,5 +1,3 @@
-pub use anymap::AnyMap;
-
 pub use winit::event::WindowEvent;
 
 pub use crate::aliases::*;
@@ -13,6 +11,8 @@ pub use crate::world::commands::*;
 pub use crate::world::Entity;
 
 pub use audio::output_handle::OutputHandle;
+
+pub use crate::events::EventHandle;
 
 /***********************
 Commands
