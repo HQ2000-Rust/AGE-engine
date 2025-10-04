@@ -1,5 +1,5 @@
 # AGE_engine
-AGE, short for "Another Game Engine", is supposed to be a simple toy game engine written in Rust with basic support for things like 2d & 3d graphics, assets and so on. Making a project using it should not take much boilerplate, be straightforward and also beginner-friendly. It is mostly working, except for the graphics.
+AGE, short for "Another Game Engine", is supposed to be a simple toy game engine **library** written in Rust with basic support for things like 2d & 3d graphics, assets and so on. Making a project using it should not take much boilerplate, be straightforward and also beginner-friendly. It is mostly working, except for the graphics.
 ## Usage
 > **sadly, uploading this to crates.io would cause heavy namespace conflicts...** (it's a workspace)
 
@@ -8,6 +8,21 @@ download the [release](https://github.com/HQ2000-Rust/AGE_engine/releases/tag/v0
 ```toml
 [dependencies]
 age_engine={ path="path/to/age_engine" }
+```
+## Example code
+Hello World
+```rust
+use age_engine::prelude::*;
+
+fn main() {
+    Game::new().add_once(once).run();
+}
+
+fn once(commands: &mut Commands, resources: &mut SendAnyMap, event_handle: &mut EventHandle) {
+    println!("Hello World!");
+}
+
+}
 ```
 ## Inspiration
 Even though this project isn't finished by far, I already have some sources that do and will influence this project:
