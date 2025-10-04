@@ -22,7 +22,6 @@ fn once(commands: &mut Commands, resources: &mut SendAnyMap, event_handle: &mut 
     println!("Hello World!");
 }
 
-}
 ```
 ## Inspiration
 Even though this project isn't finished by far, I already have some sources that do and will influence this project:
