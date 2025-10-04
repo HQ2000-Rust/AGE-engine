@@ -21,7 +21,7 @@ fn main() {
 fn once(commands: &mut Commands, resources: &mut SendAnyMap, event_handle: &mut EventHandle) {
     println!("Hello World!");
 }
-
+**Im´t is recommended to try it out by yourself as there's so much more to do than just this! (I just didn't have enough time for more examples)**
 ```
 ## Inspiration
 Even though this project isn't finished by far, I already have some sources that do and will influence this project:
