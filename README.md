@@ -21,8 +21,9 @@ fn main() {
 fn once(commands: &mut Commands, resources: &mut SendAnyMap, event_handle: &mut EventHandle) {
     println!("Hello World!");
 }
-**Im´t is recommended to try it out by yourself as there's so much more to do than just this! (I just didn't have enough time for more examples)**
 ```
+**Im´t is recommended to try it out by yourself as there's so much more to do than just this! (I just didn't have enough time for more examples)**
+
 ## Inspiration
 Even though this project isn't finished by far, I already have some sources that do and will influence this project:
 - The awesome Bevy engine: **Game Builder Pattern** (it's probably not unique to the engine, but it inspired me, so I utilize it too), **Systems** (My engine isn't an ECS, but you can add startup and update functions with three parameters), **Resources** (prob also not really unique, but I do know it from there, also, the AnyMap isn't really inspired there, I found it somewhere else and since it's so convenient I use it)
