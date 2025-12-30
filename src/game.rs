@@ -134,6 +134,49 @@ impl Game {
             }
         }
     }
+
+
+
+
+    //graphics state modifications
+
+
+    ///Sets the clear color to the provided rgba color which is drawn to the whole screen before every render.
+    /// Can be used as a provisoric one-color background
+    pub fn with_color(mut self, r: f64, g: f64, b: f64, a: f64) -> Self {
+        let config = self
+            .graphics_state_config
+            .as_mut()
+            .expect("Should be Some(_) before running");
+        config.color = wgpu::Color { r, g, b, a };
+        self
+    }
+
+    pub fn with_model<P: Into<String>>(self, name: &'static str, path: P) -> Self {
+        fn inner(mut game: Game, name: &'static str, path: String) -> Game {
+            let config = game
+                .graphics_state_config
+                .as_mut()
+                .expect("Should be Some(_) before running");
+            config.models.insert(name, path);
+            game
+        }
+        //as_ref() cosmetic here, but who cares...
+        inner(self, name, path.into())
+    }
+
+    pub fn with_image<P: AsRef<Path>>(self, path: P, name: &'static str) -> Self {
+        todo!();
+        /*fn inner(mut game: Game, path: &Path, name: &'static str) -> Game {
+            let config = game
+                .graphics_state_config
+                .as_mut()
+                .expect("Should be Some(_) before running");
+            config.assets.insert(name, Asset::Image(path.to_owned()));
+            game
+        }
+        inner(self, path.as_ref(), name)*/
+    }
 }
 
 impl ApplicationHandler<CustomEvent> for Game {
@@ -299,47 +342,6 @@ impl ApplicationHandler<CustomEvent> for Game {
             .as_ref()
             .expect("Always Some(_) while (and after) running the loop")
             .send(Terminate);
-    }
-}
-
-//graphics state modifications
-#[cfg_attr(feature = "python", pymethods)]
-impl Game {
-    ///Sets the clear color to the provided rgba color which is drawn to the whole screen before every render.
-    /// Can be used as a provisoric one-color background
-    pub fn with_color(mut self, r: f64, g: f64, b: f64, a: f64) -> Self {
-        let config = self
-            .graphics_state_config
-            .as_mut()
-            .expect("Should be Some(_) before running");
-        config.color = wgpu::Color { r, g, b, a };
-        self
-    }
-
-    pub fn with_model<P: Into<String>>(self, name: &'static str, path: P) -> Self {
-        fn inner(mut game: Game, name: &'static str, path: String) -> Game {
-            let config = game
-                .graphics_state_config
-                .as_mut()
-                .expect("Should be Some(_) before running");
-            config.models.insert(name, path);
-            game
-        }
-        //as_ref() cosmetic here, but who cares...
-        inner(self, name, path.into())
-    }
-
-    pub fn with_image<P: AsRef<Path>>(self, path: P, name: &'static str) -> Self {
-        todo!();
-        /*fn inner(mut game: Game, path: &Path, name: &'static str) -> Game {
-            let config = game
-                .graphics_state_config
-                .as_mut()
-                .expect("Should be Some(_) before running");
-            config.assets.insert(name, Asset::Image(path.to_owned()));
-            game
-        }
-        inner(self, path.as_ref(), name)*/
     }
 }
 
