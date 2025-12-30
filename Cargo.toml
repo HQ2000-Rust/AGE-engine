@@ -3,8 +3,6 @@
 [workspace]
 resolver = "3"
 members = ["crates/audio", "crates/event_derive", "crates/graphics", "crates/graphics_core", "crates/quickstart", "crates/event_derive"]
-#remove when ready
-publish = false
 
 [package]
 name = "age_engine"
@@ -12,6 +10,7 @@ version = "0.1.1"
 edition = "2024"
 authors = ["Jonathan Schmittat"]
 
+#to be removed when proper testing is underway (both)
 [[bin]]
 name="events"
 path="tests/events.rs"
@@ -23,13 +22,12 @@ path = "tests/general.rs"
 [dependencies]
 #graphics={path="./graphics"}
 graphics_core={path="crates/graphics_core"}
-audio={path="./audio"}
+audio={path="crates/audio"}
 #quickstart={path="./quickstart"}
 event_derive={path= "crates/event_derive" }
+
 anymap = "0.12.1"
 
-[dependencies.anyhow]
-version="1.0.98"
 
 [dependencies.winit]
 version="0.30.12"
@@ -65,11 +63,6 @@ version = "0.18.0"
 version = "3.2.5"
 default-features = false
 features = ["async"]
-
-
-
-[build]
-rustflags = ["-Z", "threads=8"]
 
 
 #[profile.dev]

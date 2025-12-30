@@ -35,9 +35,8 @@ checksum = "320119579fcad9c21884f5c4861d16174d0e06250625266f50fe6898340abefa"
 
 [[package]]
 name = "age_engine"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
- "anyhow",
  "anymap",
  "audio",
  "bytemuck",
@@ -369,8 +368,6 @@ version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fe6d2e5af09e8c8ad56c969f2157a3d4238cebc7c55f0a517728c38f7b200f81"
 dependencies = [
- "serde",
- "termcolor",
  "unicode-width",
 ]
 
@@ -2601,18 +2598,13 @@ dependencies = [
  "cfg_aliases",
  "document-features",
  "hashbrown",
- "js-sys",
  "log",
- "naga",
  "parking_lot",
  "portable-atomic",
  "profiling",
  "raw-window-handle",
  "smallvec",
  "static_assertions",
- "wasm-bindgen",
- "wasm-bindgen-futures",
- "web-sys",
  "wgpu-core",
  "wgpu-hal",
  "wgpu-types",
