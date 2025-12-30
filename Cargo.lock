@@ -189,7 +189,7 @@ checksum = "1505bd5d3d116872e7271a6d4e16d81d0c8570876c8de68093a09ac269d8aac0"
 
 [[package]]
 name = "audio"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "pyo3",
  "rodio",
@@ -624,7 +624,7 @@ dependencies = [
 
 [[package]]
 name = "event_derive"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -814,7 +814,7 @@ dependencies = [
 
 [[package]]
 name = "graphics"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "anyhow",
  "bytemuck",
@@ -830,7 +830,7 @@ dependencies = [
 
 [[package]]
 name = "graphics_core"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "anyhow",
  "bytemuck",
@@ -1852,7 +1852,7 @@ dependencies = [
 
 [[package]]
 name = "quickstart"
-version = "0.1.0"
+version = "0.1.1"
 
 [[package]]
 name = "quote"
