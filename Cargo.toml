@@ -2,7 +2,7 @@
 
 [workspace]
 resolver = "3"
-members = ["audio", "event_derive", "graphics", "graphics_core", "quickstart", "event_derive"]
+members = ["crates/audio", "crates/event_derive", "crates/graphics", "crates/graphics_core", "crates/quickstart", "crates/event_derive"]
 #remove when ready
 publish = false
 
@@ -22,10 +22,10 @@ path = "tests/general.rs"
 
 [dependencies]
 #graphics={path="./graphics"}
-graphics_core={path="./graphics_core"}
+graphics_core={path="crates/graphics_core"}
 audio={path="./audio"}
 #quickstart={path="./quickstart"}
-event_derive={path= "event_derive" }
+event_derive={path= "crates/event_derive" }
 anymap = "0.12.1"
 pyo3 = { version = "0.27.2", optional = true }
 
