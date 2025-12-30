@@ -335,7 +335,6 @@ impl State {
 
         camera_uniform.update_view_proj(&camera, &projection);
 
-
         Ok(Self {
             mouse_pressed: false,
             camera_controller: CameraController::new(4., 0.4),
@@ -447,7 +446,6 @@ impl State {
         });
 
         model_ids.for_each(|model_id| {
-
             //println!("Model ID: {}", model_id);
             //log::info!("rendering {:?}", model_id);
 
@@ -463,9 +461,6 @@ impl State {
 
             render_pass.draw_model(model, &self.camera_bind_group);
         });
-
-
-
 
         drop(render_pass);
 

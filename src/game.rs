@@ -193,7 +193,6 @@ impl ApplicationHandler<CustomEvent> for Game {
             println!("{:?}", event);
         }*/
 
-
         match event {
             WindowEvent::CloseRequested => event_loop.exit(),
             //I should refactor that later - TODO

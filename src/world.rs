@@ -1,6 +1,5 @@
 use cgmath::{ElementWise, Point3, Quaternion};
 use graphics_core::model::Model;
-use wgpu::wgc::id;
 use std::collections::HashSet;
 use std::fmt::{Debug, Formatter};
 use wgpu::naga::FastHashMap;
@@ -110,7 +109,7 @@ impl Entity {
 }
 
 #[cfg_attr(feature = "python", pyfunction)]
-#[cdg_attr(feature = "python", pyo3(name = "create_entity"))]
+#[cfg_attr(feature = "python", pyo3(name = "create_entity"))]
 pub fn create_entity_py(id: u32) -> Entity {
     Entity::default(id)
 }

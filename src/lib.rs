@@ -7,8 +7,7 @@ mod custom_events;
 mod events;
 mod game;
 mod game_fn;
-mod info;
-#[cfg_attr(feature = "python", pyo3::pymodule(name = "age_engine"))]
+#[cfg_attr(feature="python",pyo3::pymodule(name = "age_engine"))]
 pub mod prelude;
 mod scheduler;
 mod world;
