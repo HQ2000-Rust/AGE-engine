@@ -8,6 +8,7 @@ mod events;
 mod game;
 mod game_fn;
 mod info;
+#[pyo3::pymodule(name = "age_engine")]
 pub mod prelude;
 mod scheduler;
 mod world;

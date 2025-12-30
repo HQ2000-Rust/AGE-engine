@@ -3,12 +3,17 @@ use anymap::any::{IntoBox, UncheckedAnyExt};
 use std::any::{Any, TypeId};
 use std::fmt::Debug;
 
+use pyo3::prelude::*;
+
+#[pyclass]
 pub struct EventHandle {
     events: Option<AnyMap>,
     queue: Option<AnyMap>,
 }
 
+#[pymethods]
 impl EventHandle {
+    #[new]
     pub fn new() -> Self {
         Self {
             events: Some(AnyMap::new()),

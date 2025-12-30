@@ -8,11 +8,14 @@ use std::io::{BufReader, Cursor, Read};
 use std::marker::PhantomData;
 use std::path::Path;
 
+use pyo3::prelude::*;
+
 pub mod output_markers {
     pub struct OutputDisabled;
     pub struct OutputEnabled;
 }
 
+#[pyclass]
 pub struct OutputHandle<O> {
     pub(super) stream: Option<OutputStream>,
     pub(super) sink: Option<Sink>,

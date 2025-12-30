@@ -1,5 +1,7 @@
 use cgmath::{ElementWise, Point3, Quaternion};
 use graphics_core::model::Model;
+use pyo3::pyfunction;
+use wgpu::wgc::id;
 use std::collections::HashSet;
 use std::fmt::{Debug, Formatter};
 use wgpu::naga::FastHashMap;
@@ -71,6 +73,7 @@ impl ModelState {
 }
 
 #[derive(Clone, Debug)]
+#[pyclass]
 pub struct Entity {
     pub id: u32,
     pub model: ModelState,
@@ -78,6 +81,7 @@ pub struct Entity {
     pub rotation: Quaternion<f32>,
 }
 
+#[pymethods]
 impl Entity {
     pub fn default(id: u32) -> Self {
         Self {
@@ -101,6 +105,12 @@ impl Entity {
     fn set_model(&mut self, model: ModelState) {
         self.model = model;
     }
+}
+
+#[pyfunction]
+#[pyo3(name = "create_entity")]
+pub fn create_entity_py(id: u32) -> Entity {
+    Entity::default(id)
 }
 
 //internal state machine for all objects that render
@@ -175,7 +185,10 @@ pub mod commands {
     use crate::game::Game;
     use crate::world::Entity;
 
-    pub struct CreateEntity(pub u32, pub Entity);
+    use pyo3::prelude::*;
+
+    #[pyclass]
+    pub struct CreateEntity(pub u32, pub Entity); // TODO: check need for accessibility of fields from Python
 
     impl Command for CreateEntity {
         fn execute(&self, game: &mut Game) {
@@ -185,7 +198,8 @@ pub mod commands {
         }
     }
 
-    pub struct UpdateEntity(pub u32, pub Entity);
+    #[pyclass]
+    pub struct UpdateEntity(pub u32, pub Entity); // TODO: check need for accessibility of fields from Python
     impl Command for UpdateEntity {
         fn execute(&self, game: &mut Game) {
             if game.world.contains_entity(self.0) {
@@ -199,7 +213,9 @@ pub mod commands {
             game.world.delete_entity(self.0);
         }
     }
-    pub struct ModifyEntity(pub u32, pub dyn Fn(&mut Entity));
+
+    #[pyclass]
+    pub struct ModifyEntity(pub u32, pub dyn Fn(&mut Entity)); // TODO: check need for accessibility of fields from Python
     impl Command for ModifyEntity {
         fn execute(&self, game: &mut Game) {
             match game.world.get_entity(self.0) {
@@ -209,7 +225,8 @@ pub mod commands {
         }
     }
     //we'll see if this is necessary
-    pub struct SetEntity(pub u32, pub Entity);
+    #[pyclass]
+    pub struct SetEntity(pub u32, pub Entity); // TODO: check need for accessibility of fields from Python
 
     impl Command for SetEntity {
         fn execute(&self, game: &mut Game) {
@@ -217,7 +234,8 @@ pub mod commands {
         }
     }
     //the second one is the index in the loaded models
-    pub struct SetEntityModel(pub u32, pub &'static str);
+    #[pyclass]
+    pub struct SetEntityModel(pub u32, pub &'static str); // TODO: check need for accessibility of fields from Python
     impl Command for SetEntityModel {
         fn execute(&self, game: &mut Game) {
             /*println!(
