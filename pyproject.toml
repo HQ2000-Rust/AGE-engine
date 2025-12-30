@@ -14,3 +14,6 @@ dynamic = [
     "version",
     "authors"
 ]
+
+[tool.maturin]
+cargo-extra-args = "--features python"
