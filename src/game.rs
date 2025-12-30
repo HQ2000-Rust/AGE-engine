@@ -13,7 +13,6 @@ use pyo3::prelude::*;
 const FPS: u32 = 60;
 
 #[cfg_attr(feature = "python", pyclass)]
-#[pyclass]
 pub struct Game { // TODO: check if properties need to be accessible from Python
     //Terminate is a ZST (=just symbolic)
     pub(crate) termination_tx: Option<std::sync::mpsc::SyncSender<Terminate>>,
@@ -57,10 +56,8 @@ struct Terminate;
 
 
 #[cfg_attr(feature = "python", pymethods)]
-#[pymethods]
 impl Game {
     #[cfg_attr(feature = "python", new)]
-    #[new]
     pub fn new() -> Self {
         Default::default()
     }
@@ -308,7 +305,6 @@ impl ApplicationHandler<CustomEvent> for Game {
 
 //graphics state modifications
 #[cfg_attr(feature = "python", pymethods)]
-#[pymethods]
 impl Game {
     ///Sets the clear color to the provided rgba color which is drawn to the whole screen before every render.
     /// Can be used as a provisoric one-color background

@@ -17,7 +17,6 @@ pub mod output_markers {
 }
 
 #[cfg_attr(feature = "python", pyclass)]
-#[pyclass]
 pub struct OutputHandle<O> {
     pub(super) stream: Option<OutputStream>,
     pub(super) sink: Option<Sink>,

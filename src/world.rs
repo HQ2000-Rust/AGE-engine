@@ -76,7 +76,6 @@ impl ModelState {
 
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "python", pyclass)]
-#[pyclass]
 pub struct Entity {
     pub id: u32,
     pub model: ModelState,
@@ -85,7 +84,6 @@ pub struct Entity {
 }
 
 #[cfg_attr(feature = "python", pymethods)]
-#[pymethods]
 impl Entity {
     pub fn default(id: u32) -> Self {
         Self {
@@ -112,8 +110,7 @@ impl Entity {
 }
 
 #[cfg_attr(feature = "python", pyfunction)]
-#[pyfunction]
-#[pyo3(name = "create_entity")]
+#[cdg_attr(feature = "python", pyo3(name = "create_entity"))]
 pub fn create_entity_py(id: u32) -> Entity {
     Entity::default(id)
 }
@@ -194,7 +191,6 @@ pub mod commands {
     use pyo3::prelude::*;
 
     #[cfg_attr(feature = "python", pyclass)]
-    #[pyclass]
     pub struct CreateEntity(pub u32, pub Entity); // TODO: check need for accessibility of fields from Python
 
     impl Command for CreateEntity {
@@ -206,7 +202,6 @@ pub mod commands {
     }
 
     #[cfg_attr(feature = "python", pyclass)]
-    #[pyclass]
     pub struct UpdateEntity(pub u32, pub Entity); // TODO: check need for accessibility of fields from Python
     impl Command for UpdateEntity {
         fn execute(&self, game: &mut Game) {
@@ -216,7 +211,6 @@ pub mod commands {
         }
     }
     #[cfg_attr(feature = "python", pyclass)]
-    #[pyclass]
     pub struct DeleteEntity(pub u32); // TODO: check need for accessibility of fields from Python
     impl Command for DeleteEntity {
         fn execute(&self, game: &mut Game) {
@@ -225,7 +219,6 @@ pub mod commands {
     }
 
     #[cfg_attr(feature = "python", pyclass)]
-    #[pyclass]
     pub struct ModifyEntity(pub u32, pub dyn Fn(&mut Entity)); // TODO: check need for accessibility of fields from Python
     impl Command for ModifyEntity {
         fn execute(&self, game: &mut Game) {
@@ -237,7 +230,6 @@ pub mod commands {
     }
     //we'll see if this is necessary
     #[cfg_attr(feature = "python", pyclass)]
-    #[pyclass]
     pub struct SetEntity(pub u32, pub Entity); // TODO: check need for accessibility of fields from Python
 
     impl Command for SetEntity {
@@ -247,7 +239,6 @@ pub mod commands {
     }
     //the second one is the index in the loaded models
     #[cfg_attr(feature = "python", pyclass)]
-    #[pyclass]
     pub struct SetEntityModel(pub u32, pub &'static str); // TODO: check need for accessibility of fields from Python
     impl Command for SetEntityModel {
         fn execute(&self, game: &mut Game) {
