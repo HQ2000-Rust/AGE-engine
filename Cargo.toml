@@ -21,10 +21,10 @@ path = "tests/general.rs"
 
 [dependencies]
 #graphics={path="./graphics"}
-graphics_core={path="crates/graphics_core"}
-audio={path="crates/audio"}
+graphics_core={path="crates/graphics_core",version="0.1.1"}
+audio={path="crates/audio", version="0.1.1"}
 #quickstart={path="./quickstart"}
-event_derive={path= "crates/event_derive" }
+event_derive={path= "crates/event_derive",version="0.1.1"}
 
 anymap = "0.12.1"
 
