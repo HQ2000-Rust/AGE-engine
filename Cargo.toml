@@ -36,4 +36,4 @@ tobj={version = "3.2.5",default-features = false,features = ["async"]}
 pyo3 = { version = "0.27.2", optional = true }
 
 [features]
-python=["pyo3/multiple-pymethods", "audio/python"]
+python=["pyo3/multiple-pymethods"]
