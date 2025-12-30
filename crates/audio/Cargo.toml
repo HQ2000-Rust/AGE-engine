@@ -1,9 +1,13 @@
 [package]
 name = "audio"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 
 [dependencies]
+pyo3 = { version = "0.27.2", optional = true }
 
 [dependencies.rodio]
 version="0.21.1"
+
+[features]
+python = ["dep:pyo3"]

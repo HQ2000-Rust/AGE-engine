@@ -1,8 +1,12 @@
 use cgmath::{ElementWise, Point3, Quaternion};
 use graphics_core::model::Model;
+use wgpu::wgc::id;
 use std::collections::HashSet;
 use std::fmt::{Debug, Formatter};
 use wgpu::naga::FastHashMap;
+
+#[cfg(feature = "python")]
+use pyo3::pyfunction;
 
 #[derive(Default, Debug, Clone)]
 pub enum ModelState {
@@ -71,13 +75,15 @@ impl ModelState {
 }
 
 #[derive(Clone, Debug)]
-pub struct Entity {
+#[cfg_attr(feature = "python", pyclass)]
+pub struct Entity { // TODO
     pub id: u32,
     pub model: ModelState,
     pub pos: Point3<f32>,
     pub rotation: Quaternion<f32>,
 }
 
+#[cfg_attr(feature = "python", pymethods)]
 impl Entity {
     pub fn default(id: u32) -> Self {
         Self {
@@ -101,6 +107,12 @@ impl Entity {
     fn set_model(&mut self, model: ModelState) {
         self.model = model;
     }
+}
+
+#[cfg_attr(feature = "python", pyfunction)]
+#[cdg_attr(feature = "python", pyo3(name = "create_entity"))]
+pub fn create_entity_py(id: u32) -> Entity {
+    Entity::default(id)
 }
 
 //internal state machine for all objects that render
@@ -175,7 +187,11 @@ pub mod commands {
     use crate::game::Game;
     use crate::world::Entity;
 
-    pub struct CreateEntity(pub u32, pub Entity);
+    #[cfg(feature = "python")]
+    use pyo3::prelude::*;
+
+    #[cfg_attr(feature = "python", pyclass)]
+    pub struct CreateEntity(pub u32, pub Entity); // TODO: check need for accessibility of fields from Python
 
     impl Command for CreateEntity {
         fn execute(&self, game: &mut Game) {
@@ -185,7 +201,8 @@ pub mod commands {
         }
     }
 
-    pub struct UpdateEntity(pub u32, pub Entity);
+    #[cfg_attr(feature = "python", pyclass)]
+    pub struct UpdateEntity(pub u32, pub Entity); // TODO: check need for accessibility of fields from Python
     impl Command for UpdateEntity {
         fn execute(&self, game: &mut Game) {
             if game.world.contains_entity(self.0) {
@@ -193,13 +210,16 @@ pub mod commands {
             }
         }
     }
-    pub struct DeleteEntity(pub u32);
+    #[cfg_attr(feature = "python", pyclass)]
+    pub struct DeleteEntity(pub u32); // TODO: check need for accessibility of fields from Python
     impl Command for DeleteEntity {
         fn execute(&self, game: &mut Game) {
             game.world.delete_entity(self.0);
         }
     }
-    pub struct ModifyEntity(pub u32, pub dyn Fn(&mut Entity));
+
+    #[cfg_attr(feature = "python", pyclass)]
+    pub struct ModifyEntity(pub u32, pub dyn Fn(&mut Entity)); // TODO: check need for accessibility of fields from Python
     impl Command for ModifyEntity {
         fn execute(&self, game: &mut Game) {
             match game.world.get_entity(self.0) {
@@ -209,7 +229,8 @@ pub mod commands {
         }
     }
     //we'll see if this is necessary
-    pub struct SetEntity(pub u32, pub Entity);
+    #[cfg_attr(feature = "python", pyclass)]
+    pub struct SetEntity(pub u32, pub Entity); // TODO: check need for accessibility of fields from Python
 
     impl Command for SetEntity {
         fn execute(&self, game: &mut Game) {
@@ -217,7 +238,8 @@ pub mod commands {
         }
     }
     //the second one is the index in the loaded models
-    pub struct SetEntityModel(pub u32, pub &'static str);
+    #[cfg_attr(feature = "python", pyclass)]
+    pub struct SetEntityModel(pub u32, pub &'static str); // TODO: check need for accessibility of fields from Python
     impl Command for SetEntityModel {
         fn execute(&self, game: &mut Game) {
             /*println!(

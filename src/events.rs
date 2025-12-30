@@ -3,12 +3,18 @@ use anymap::any::{IntoBox, UncheckedAnyExt};
 use std::any::{Any, TypeId};
 use std::fmt::Debug;
 
+#[cfg(feature = "python")]
+use pyo3::prelude::*;
+
+#[cfg_attr(feature = "python", pyclass)]
 pub struct EventHandle {
     events: Option<AnyMap>,
     queue: Option<AnyMap>,
 }
 
+#[cfg_attr(feature = "python", pymethods)]
 impl EventHandle {
+    #[cfg_attr(feature = "python", new)]
     pub fn new() -> Self {
         Self {
             events: Some(AnyMap::new()),

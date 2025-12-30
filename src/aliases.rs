@@ -1,6 +1,10 @@
+#[cfg(feature = "python")]
+use pyo3::prelude::*;
+
 use crate::commands::CommandHandle;
 use crate::events::EventHandle;
 use anymap::{AnyMap, Map};
+
 pub(crate) type BoxedGameFn =
     Box<dyn FnMut(&mut Commands, &mut SendAnyMap, &mut EventHandle) + 'static + Send>;
 pub(crate) type _MaxParamGameFn = Box<dyn FnMut(&mut Commands, &mut AnyMap, &mut Events) + 'static>;
