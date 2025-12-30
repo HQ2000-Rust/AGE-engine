@@ -1,7 +1,7 @@
 use proc_macro::TokenStream;
 use quote::quote;
 use syn::{DeriveInput, parse_macro_input};
-//to be finished later
+//to be finished later (typename!!!)
 
 #[proc_macro_derive(Event)]
 pub fn event_derive(input: TokenStream) -> TokenStream {

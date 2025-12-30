@@ -10,12 +10,6 @@ version = "0.1.1"
 edition = "2024"
 authors = ["Jonathan Schmittat"]
 
-#to be removed when proper testing is underway
-[[bin]]
-name="events"
-path="tests/events.rs"
-
-
 [dependencies]
 #graphics={path="./graphics"}
 graphics_core={path="crates/graphics_core",version="0.1.1"}
