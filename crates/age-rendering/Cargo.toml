@@ -10,7 +10,6 @@ fs_extra = "1.2"
 glob = "0.3"
 
 [dependencies]
-graphics ={path="../graphics"}
 color="0.3.1"
 
 [dependencies.winit]
