@@ -60,14 +60,17 @@ dependencies = [
 
 [[package]]
 name = "age-graphics"
-version = "0.1.0"
+version = "0.1.1"
+dependencies = [
+ "age-rendering",
+]
 
 [[package]]
 name = "age-quickstart"
 version = "0.1.1"
 
 [[package]]
-name = "age_rendering"
+name = "age-rendering"
 version = "0.1.1"
 dependencies = [
  "anyhow",
