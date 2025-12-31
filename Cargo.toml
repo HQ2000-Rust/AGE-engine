@@ -2,12 +2,12 @@
 
 [workspace]
 resolver = "3"
-members = ["crates/age_audio", 
-#"crates/age_event_derive", #probably removed soon
-"crates/age_graphics", #age render maybe (both)
-"crates/age_raphics_core", 
-"crates/age_quickstart"
-, "crates/age-graphics"]
+members = [
+"crates/age-audio", 
+"crates/age-rendering", 
+"crates/age-quickstart",
+"crates/age-graphics"
+]
 
 [package]
 name = "age_engine"
@@ -16,11 +16,7 @@ edition = "2024"
 authors = ["Jonathan Schmittat"]
 
 [dependencies]
-#graphics={path="./graphics"}
-graphics_core={path="crates/graphics_core",version="0.1.1"}
-audio={path="crates/audio", version="0.1.1"}
-#quickstart={path="./quickstart"}
-event_derive={path= "crates/event_derive",version="0.1.1"}
+#soon
 
 env_logger="0.10.2"
 log="0.4.0"
