@@ -7,7 +7,7 @@ members = ["crates/age_audio",
 "crates/age_graphics", #age render maybe (both)
 "crates/age_raphics_core", 
 "crates/age_quickstart"
-]
+, "crates/age-graphics"]
 
 [package]
 name = "age_engine"
