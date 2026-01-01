@@ -3,10 +3,10 @@
 [workspace]
 resolver = "3"
 members = [
-"crates/age-audio", 
-"crates/age-rendering", 
-"crates/age-quickstart",
-"crates/age-graphics"
+"crates/age_audio", 
+"crates/age_rendering", 
+"crates/age_quickstart",
+"crates/age_graphics"
 ]
 
 [package]
@@ -16,7 +16,7 @@ edition = "2024"
 authors = ["Jonathan Schmittat"]
 
 [dependencies]
-age_audio={path="crates/age-audio"}
+age_audio={path="crates/age_audio"}
 
 env_logger="0.10.2"
 log="0.4.0"
